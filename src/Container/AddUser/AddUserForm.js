@@ -52,7 +52,6 @@ function SignUp(props) {
                 rules={[
                     {
                         required: true,
-                        type: "date",
                         message: 'Please enter birthDate',
                     },
                 ]}>
@@ -93,6 +92,12 @@ function SignUp(props) {
             <Form.Item
                 label="Hobbies"
                 name="hobbies"
+                rules={[
+                    {
+                        required: true,
+                        message: 'Please select Hobbies',
+                    },
+                ]}
             >
                 <Checkbox.Group
                     onChange={onHobbySelect}
