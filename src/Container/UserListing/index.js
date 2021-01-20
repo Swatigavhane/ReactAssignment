@@ -10,9 +10,13 @@ const _ = require('lodash')
 
 const { confirm } = Modal
 
+const colStyle = {
+    wordWrap: 'break-word', maxWidth: '250px'
+}
+
 function UserListing(props) {
 
-    const { addedUsers, onUserAdd } = props
+    const { addedUsers, onUserAddUpdate } = props
 
     const [filter, setFilter] = useState({ page: 1, limit: 10 })
     const [total, setTotal] = useState(0)
@@ -27,6 +31,7 @@ function UserListing(props) {
     }, [filter, addedUsers])
 
     const fetchListing = () => {
+        //fetch added user list
         if (addedUsers) {
             let tempUserListing = _.cloneDeep(addedUsers)
             setTotal(tempUserListing.length)
@@ -53,51 +58,44 @@ function UserListing(props) {
         let tempUserListing = _.cloneDeep(addedUsers)
         let result = tempUserListing.filter(obj => obj.id !== user.id)
         setData(result)
-        onUserAdd(result)
+        onUserAddUpdate(result)
     }
 
     const getColumns = () => [
         {
             title: 'No.',
             dataIndex: 'index',
-            key: 'index',
             render: (text, record, index) => <span>{((filter.page - 1) * filter.limit) + index}</span>
         },
         {
             title: 'Name',
             dataIndex: 'name',
-            key: 'name',
-            render: (text) => (<span style={{ wordWrap: 'break-word' }}>{text}</span>)
+            render: (text) => (<span>{text}</span>)
         },
         {
             title: 'Birth Date',
             dataIndex: 'birthDate',
-            key: 'birthDate',
-            render: (text) => (<span style={{ wordWrap: 'break-word' }}>{moment(text).format('MM/DD/YYYY')}</span>)
+            render: (text) => (<span>{moment(text).format('MM/DD/YYYY')}</span>)
         },
         {
             title: 'Address',
             dataIndex: 'address',
-            key: 'address',
-            render: (text) => (<div style={{ wordWrap: 'break-word', maxWidth: '250px' }}>{text}</div>)
+            render: (text) => (<div style={colStyle}>{text}</div>)
         },
         {
             title: 'College',
             dataIndex: 'college',
-            key: 'college',
-            render: (text) => (<span style={{ wordWrap: 'break-word' }}>{text}</span>)
+            render: (text) => (<div style={colStyle}>{text}</div>)
         },
         {
             title: 'Hobbies',
             dataIndex: 'hobbies',
-            key: 'hobbies',
-            render: (text) => (<span style={{ wordWrap: 'break-word' }}>{text.join(',')}</span>)
+            render: (text) => (<div style={colStyle}>{text.join(',')}</div>)
         },
         {
             title: 'Action',
-            key: 'x',
             render: (text, record) => (
-                <div>
+                <div style={{ minWidth: "60px" }}>
                     <span style={{ marginRight: '15px' }}>
                         <Tooltip title="Delete"><DeleteOutlined onClick={() => showConfirm(record)} /></Tooltip>
                     </span>
@@ -115,6 +113,7 @@ function UserListing(props) {
             if (editRecord) setEditRecord(undefined)
         }
         if (user) {
+            user.birthDate = moment(user.birthDate)
             setEditRecord(user)
             setIsEdit(true)
         }
@@ -135,6 +134,7 @@ function UserListing(props) {
                 type="primary"
                 onClick={() => handleAddEditUser(true)}>Add User</Button>
         </div>
+        {/*added user listing*/}
         <Table
             dataSource={data}
             columns={getColumns()}
@@ -146,6 +146,7 @@ function UserListing(props) {
             onChange={handleTableChange}
             loading={loading}
         />
+        {/*User PopUp for Add/Edit*/}
         {
             isModalVisible ?
                 <UserModal
@@ -161,7 +162,7 @@ function UserListing(props) {
 
 }
 const mapDispatchToProps = dispatch => ({
-    onUserAdd: data => dispatch({ type: ADD_USER, payload: data })
+    onUserAddUpdate: data => dispatch({ type: ADD_USER, payload: data })
 })
 const mapStateToProps = ({ users }) => {
     const { addedUsers } = users

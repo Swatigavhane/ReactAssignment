@@ -11,7 +11,7 @@ const _ = require('lodash')
 let searchTimeout
 function AddUserMain(props) {
 
-    const { addedUsers, onUserAdd, handleCancel, handleOk, isEdit, record } = props
+    const { addedUsers, onUserAddUpdate, handleCancel, handleOk, isEdit, record } = props
     const [isOtherSelected, setOtherSelected] = useState(false)
     const [collegeList, setCollegeList] = useState([])
 
@@ -22,6 +22,8 @@ function AddUserMain(props) {
     }, [isEdit])
 
     const handleSearch = val => {
+        // handle college list search 
+
         if (searchTimeout) {
             clearTimeout(searchTimeout)
         }
@@ -32,9 +34,10 @@ function AddUserMain(props) {
                 data = data.splice(0, 10)
                 setCollegeList(data)
             })
-        }, 600)
+        }, 400)
     }
     const handleHobbySelect = (hobbies) => {
+        // if other option is selected in hobbies the set other selected to true
         if (hobbies.indexOf('Other') >= 0 && !isOtherSelected) {
             setOtherSelected(true)
         }
@@ -55,7 +58,7 @@ function AddUserMain(props) {
             values.createdAt = record.createdAt
             tempAddedUsers = tempAddedUsers.map(obj => {
                 if (obj.id === record.id) {
-                    obj = { ...values }
+                    obj = { ...record, ...values }
                 }
                 return obj
             })
@@ -66,7 +69,7 @@ function AddUserMain(props) {
         }
 
         localStorage.setItem('addedUsers', JSON.stringify(tempAddedUsers))
-        onUserAdd(tempAddedUsers)
+        onUserAddUpdate(tempAddedUsers)
         handleCancel(false)
     }
     return <AddUserForm
@@ -81,7 +84,7 @@ function AddUserMain(props) {
     />
 }
 const mapDispatchToProps = dispatch => ({
-    onUserAdd: data => dispatch({ type: ADD_USER, payload: data })
+    onUserAddUpdate: data => dispatch({ type: ADD_USER, payload: data })
 })
 const mapStateToProps = ({ users }) => {
     const { addedUsers } = users
